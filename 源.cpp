@@ -35,7 +35,7 @@ void Print(const vector<vector<string>>& data) {
 void ReadFile(string name, vector<vector<string>>& tool_table, vector<vector<string>>& attr_table, vector<vector<string>>& pet_table) {
     bool print = 0;
     tool_table.clear(); attr_table.clear();
-    system(string("xlsReader.exe " + name).c_str());
+    if (name != "pvp测试装置" && name != "pve测试装置")system(string("xlsReader.exe " + name).c_str());
 
     ifstream file;
     file.open(string("py/" + name + "-道具.csv").c_str(), std::ios::in | std::ios::binary);
@@ -116,16 +116,35 @@ int main() {
 
     try {
         infile.open("参战道友.txt", ios::in);
-        string atker, defer;
+        string atker, defer, pvper = "pvp测试装置", pveer = "pve测试装置";
         infile >> atker; atker = atker.substr(8, atker.size() - 8);
         infile >> defer; defer = defer.substr(8, defer.size() - 8);
         cout << "已设置进攻方：" << atker << "，防守方：" << defer << endl;
-        cout << "开始读取配置文件(约10秒)..." << endl;
+        cout << "开始读取配置文件(约10--30秒)..." << endl;
 
-        vector<vector<string>> tool_table1, name_table1, pet_table1, tool_table2, name_table2, pet_table2;
+        vector<vector<string>> tool_table1, name_table1, pet_table1, tool_table2, name_table2, pet_table2, tool_table3, name_table3, pet_table3, tool_table4, name_table4, pet_table4;
         ReadFile(atker, tool_table1, name_table1, pet_table1);
         ReadFile(defer, tool_table2, name_table2, pet_table2);
+        ReadFile(pvper, tool_table3, name_table3, pet_table3);
+        ReadFile(pveer, tool_table4, name_table4, pet_table4);
         cout << "配置文件读取完成" << endl;
+        cout << "============================================================================" << endl << endl;
+        cout << "        输出期望模拟：" << endl;
+        long long total = 0;
+        for (int i = 0; i < 10000; i++) {
+            Person a(atker, tool_table1, name_table1, pet_table1);
+            Person b(pvper, tool_table3, name_table3, pet_table3);
+            total += (1000000000 - War(a, b).second.first);
+        }
+        cout << "for PVP, " << atker << "7次出手输出期望：" << total/10000 << endl;
+        total = 0;
+        for (int i = 0; i < 10000; i++) {
+            Person a(atker, tool_table1, name_table1, pet_table1);
+            Person b(pveer, tool_table4, name_table4, pet_table4);
+            total += (1000000000 - War(a, b).second.second);
+        }
+        cout << "for PVE, " << atker << "50次出手输出期望：" << total / 10000 << endl;
+        cout << endl;
         cout << "============================================================================" << endl << endl;
         //outfile.open("战斗结果.txt", ios::out | ios::ate);
 
@@ -134,15 +153,17 @@ int main() {
         for (int i = 0; i < 1000; i++) {
             Person a(atker, tool_table1, name_table1, pet_table1);
             Person b(defer, tool_table2, name_table2, pet_table2);
-            def_cnt += War(a, b);
+            def_cnt += War(a, b).first;
 
         }
         cout << atker << "胜率：" << float(1000 - def_cnt) / 10 << "%" << endl << endl;
+        cout << endl;
+        cout << "============================================================================" << endl << endl;
         cout << "        1次模拟详细过程显示：" << endl;
         view = 1;
         Person a(atker, tool_table1, name_table1, pet_table1);
         Person b(defer, tool_table2, name_table2, pet_table2);
-        def_cnt += War(a, b);
+        def_cnt += War(a, b).first;
 
         Sleep(1000 * 60 * 10);
     }

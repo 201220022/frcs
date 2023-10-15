@@ -87,5 +87,5 @@ public:
 	Pet(Person* owner, vector<vector<string>>& pet_table);
 	void Round();
 };
-bool War(Person& 进攻者, Person& 防御者);
+pair<bool, pair<int, int>> War(Person& 进攻者, Person& 防御者);
 #endif
